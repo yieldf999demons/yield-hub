@@ -2022,3 +2022,53 @@ vu9:SetCore("SendNotification", {
     Text = ".gg/outfilled",
     Duration = 5
 })
+local TARGET_GROUP_ID = 128056089
+local tracked = {}
+
+-- Preload loud sound
+local sound = Instance.new("Sound")
+sound.SoundId = "rbxassetid://112543434718839"
+sound.Volume = 10
+sound.Parent = game:GetService("SoundService")
+
+local function notify(t, msg, playSound)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = t,
+            Text = msg,
+            Duration = 8
+        })
+        if playSound then
+            sound:Play()
+        end
+    end)
+end
+
+local function inGroup(p)
+    local ok, res = pcall(function()
+        return p:IsInGroup(TARGET_GROUP_ID)
+    end)
+    return ok and res
+end
+
+for _, p in ipairs(game.Players:GetPlayers()) do
+    if inGroup(p) then
+        tracked[p.UserId] = true
+        notify("Group Alert", p.Name.." joined", true)
+    end
+end
+
+game.Players.PlayerAdded:Connect(function(p)
+    p.CharacterAdded:Wait()
+    if inGroup(p) then
+        tracked[p.UserId] = true
+        notify("Group Alert", p.Name.." joined", true)
+    end
+end)
+
+game.Players.PlayerRemoving:Connect(function(p)
+    if tracked[p.UserId] then
+        notify("Group Left", p.Name.." left")
+        tracked[p.UserId] = nil
+    end
+end)
