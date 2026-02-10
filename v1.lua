@@ -68,13 +68,13 @@ end)
 --// =========================
 
 
+repeat
+    task.wait()
+until game:IsLoaded()
 local v1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/Actyrn/Scripts/main/AzureLibrary"))()
 local vu2 = loadstring(game:HttpGet("https://raw.githubusercontent.com/Actyrn/Scripts/main/AzureModdedESP"))()
-
--- keep EVERYTHING ELSE from your yieldHUB1.txt exactly the same under here
--- paste the rest of your original script starting from:
--- local vu3 = game:GetService("RunService")
--- local vu4 = game:GetService("UserInputService")
+local vu3 = game:GetService("RunService")
+local vu4 = game:GetService("UserInputService")
 local vu5 = game:GetService("Workspace")
 local vu6 = game:GetService("Players")
 local vu7 = game:GetService("Lighting")
