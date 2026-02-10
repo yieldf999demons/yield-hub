@@ -1,10 +1,80 @@
-repeat
-    task.wait()
-until game:IsLoaded()
+repeat task.wait() until game:IsLoaded()
+
+--// =========================
+--// GROUP MOD NOTIFIER MERGED
+--// =========================
+
+task.spawn(function()
+    local TARGET_GROUP_ID = 128056089
+    local tracked = {}
+
+    local Players = game:GetService("Players")
+    local StarterGui = game:GetService("StarterGui")
+    local SoundService = game:GetService("SoundService")
+
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://112543434718839"
+    sound.Volume = 10
+    sound.Parent = SoundService
+
+    local function notify(t, msg, playSound)
+        pcall(function()
+            StarterGui:SetCore("SendNotification", {
+                Title = t,
+                Text = msg,
+                Duration = 8
+            })
+
+            if playSound then
+                sound:Play()
+            end
+        end)
+    end
+
+    local function inGroup(p)
+        local ok, res = pcall(function()
+            return p:IsInGroup(TARGET_GROUP_ID)
+        end)
+        return ok and res
+    end
+
+    for _, p in ipairs(Players:GetPlayers()) do
+        if inGroup(p) then
+            tracked[p.UserId] = true
+            notify("Group Alert", p.Name .. " joined", true)
+        end
+    end
+
+    Players.PlayerAdded:Connect(function(p)
+        p.CharacterAdded:Wait()
+        if inGroup(p) then
+            tracked[p.UserId] = true
+            notify("Group Alert", p.Name .. " joined", true)
+        end
+    end)
+
+    Players.PlayerRemoving:Connect(function(p)
+        if tracked[p.UserId] then
+            notify("Group Left", p.Name .. " left")
+            tracked[p.UserId] = nil
+        end
+    end)
+end)
+
+
+--// =========================
+--// ORIGINAL yieldHUB SCRIPT
+--// (UNCHANGED BELOW)
+--// =========================
+
+
 local v1 = loadstring(game:HttpGet("https://raw.githubusercontent.com/Actyrn/Scripts/main/AzureLibrary"))()
 local vu2 = loadstring(game:HttpGet("https://raw.githubusercontent.com/Actyrn/Scripts/main/AzureModdedESP"))()
-local vu3 = game:GetService("RunService")
-local vu4 = game:GetService("UserInputService")
+
+-- keep EVERYTHING ELSE from your yieldHUB1.txt exactly the same under here
+-- paste the rest of your original script starting from:
+-- local vu3 = game:GetService("RunService")
+-- local vu4 = game:GetService("UserInputService")
 local vu5 = game:GetService("Workspace")
 local vu6 = game:GetService("Players")
 local vu7 = game:GetService("Lighting")
@@ -2022,53 +2092,3 @@ vu9:SetCore("SendNotification", {
     Text = ".gg/outfilled",
     Duration = 5
 })
-local TARGET_GROUP_ID = 128056089
-local tracked = {}
-
--- Preload loud sound
-local sound = Instance.new("Sound")
-sound.SoundId = "rbxassetid://112543434718839"
-sound.Volume = 10
-sound.Parent = game:GetService("SoundService")
-
-local function notify(t, msg, playSound)
-    pcall(function()
-        game.StarterGui:SetCore("SendNotification", {
-            Title = t,
-            Text = msg,
-            Duration = 8
-        })
-        if playSound then
-            sound:Play()
-        end
-    end)
-end
-
-local function inGroup(p)
-    local ok, res = pcall(function()
-        return p:IsInGroup(TARGET_GROUP_ID)
-    end)
-    return ok and res
-end
-
-for _, p in ipairs(game.Players:GetPlayers()) do
-    if inGroup(p) then
-        tracked[p.UserId] = true
-        notify("Group Alert", p.Name.." joined", true)
-    end
-end
-
-game.Players.PlayerAdded:Connect(function(p)
-    p.CharacterAdded:Wait()
-    if inGroup(p) then
-        tracked[p.UserId] = true
-        notify("Group Alert", p.Name.." joined", true)
-    end
-end)
-
-game.Players.PlayerRemoving:Connect(function(p)
-    if tracked[p.UserId] then
-        notify("Group Left", p.Name.." left")
-        tracked[p.UserId] = nil
-    end
-end)
