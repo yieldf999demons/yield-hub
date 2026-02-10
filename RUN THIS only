@@ -1,1 +1,0 @@
-loadstring(game:HttpGet("https://raw.githubusercontent.com/yieldf999demons/yield-hub/main/loader.lua"))()
